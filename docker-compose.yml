@@ -1,0 +1,156 @@
+services:
+  # VictoriaMetrics - Time Series Database
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics:latest
+    container_name: victoria-metrics
+    restart: unless-stopped
+    ports:
+      - "8428:8428"
+    volumes:
+      - victoria-metrics-data:/victoria-metrics-data
+    command:
+      - "--storageDataPath=/victoria-metrics-data"
+      - "--retentionPeriod=12"
+      - "--httpListenAddr=:8428"
+    environment:
+      - TZ=UTC
+    networks:
+      - observability
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8428/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # VictoriaLogs - Log Aggregation
+  victoria-logs:
+    image: victoriametrics/victoria-logs:latest
+    container_name: victoria-logs
+    restart: unless-stopped
+    ports:
+      - "9428:9428"
+    volumes:
+      - victoria-logs-data:/victoria-logs-data
+    command:
+      - "--storageDataPath=/victoria-logs-data"
+      - "--httpListenAddr=:9428"
+    environment:
+      - TZ=UTC
+    networks:
+      - observability
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:9428/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Loki - Log backend used by Grafana Logs Drilldown app
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./observability/loki/loki-config.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
+    command: ["-config.file=/etc/loki/config.yml"]
+    environment:
+      - TZ=UTC
+    networks:
+      - observability
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # VictoriaTraces - Distributed Tracing
+  victoria-traces:
+    image: victoriametrics/victoria-traces:latest
+    container_name: victoria-traces
+    restart: unless-stopped
+    ports:
+      - "9429:9428"   # Query API
+    volumes:
+      - victoria-traces-data:/victoria-traces-data
+    command:
+      - "--storageDataPath=/victoria-traces-data"
+      - "--httpListenAddr=:9428"
+    environment:
+      - TZ=UTC
+    networks:
+      - observability
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:9428/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Grafana - Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource,victoriametrics-logs-datasource
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - TZ=UTC
+    networks:
+      - observability
+    depends_on:
+      victoria-metrics:
+        condition: service_healthy
+      victoria-logs:
+        condition: service_healthy
+      victoria-traces:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # OpenTelemetry Collector - Receives OTLP from apps
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    restart: unless-stopped
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "13133:13133" # Collector health check
+    volumes:
+      - ./observability/otel-collector/otel-collector-config.yml:/etc/otel-collector-config.yml:ro
+    command: ["--config=/etc/otel-collector-config.yml"]
+    networks:
+      - observability
+    depends_on:
+      victoria-metrics:
+        condition: service_healthy
+      victoria-logs:
+        condition: service_healthy
+      victoria-traces:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+
+networks:
+  observability:
+    driver: bridge
+
+volumes:
+  victoria-metrics-data:
+  victoria-logs-data:
+  victoria-traces-data:
+  grafana-data:
+  loki-data:
