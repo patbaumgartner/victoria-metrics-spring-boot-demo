@@ -1,0 +1,70 @@
+apiVersion: 1
+
+datasources:
+  # Metrics - official VictoriaMetrics datasource plugin
+  - name: VictoriaMetrics
+    uid: victoria-metrics
+    type: victoriametrics-metrics-datasource
+    access: proxy
+    url: http://victoria-metrics:8428
+    isDefault: true
+    jsonData:
+      timeInterval: 30s
+    editable: true
+
+  # Compatibility datasource for Grafana Drilldown Metrics app (expects type=prometheus)
+  - name: VictoriaMetrics (Prometheus API)
+    uid: victoria-metrics-prometheus
+    type: prometheus
+    access: proxy
+    url: http://victoria-metrics:8428/prometheus
+    jsonData:
+      httpMethod: POST
+      timeInterval: 30s
+    editable: true
+
+  # Logs - official VictoriaLogs datasource plugin
+  - name: VictoriaLogs
+    uid: victoria-logs
+    type: victoriametrics-logs-datasource
+    access: proxy
+    url: http://victoria-logs:9428
+    editable: true
+
+  # Compatibility datasource for Grafana Logs Drilldown app (expects type=loki)
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: true
+
+  # Traces - VictoriaTraces exposes a Jaeger-compatible query API
+  - name: VictoriaTraces
+    uid: victoria-traces
+    type: jaeger
+    access: proxy
+    url: http://victoria-traces:9428/select/jaeger
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: victoria-logs
+        filterByTraceID: true
+        filterBySpanID: true
+      tracesToMetrics:
+        datasourceUid: victoria-metrics
+    editable: true
+
+  # Compatibility datasource for Grafana Drilldown Traces app (expects type=tempo)
+  - name: VictoriaTraces (Tempo API)
+    uid: victoria-traces-tempo
+    type: tempo
+    access: proxy
+    url: http://victoria-traces:9428/select/tempo
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: victoria-logs
+        filterByTraceID: true
+        filterBySpanID: true
+      tracesToMetrics:
+        datasourceUid: victoria-metrics
+    editable: true

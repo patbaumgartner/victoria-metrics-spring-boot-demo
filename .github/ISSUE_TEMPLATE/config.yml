@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/patbaumgartner/victoria-metrics-spring-boot-demo/security/advisories/new
+    about: Please report security issues privately.
+  - name: Documentation
+    url: https://github.com/patbaumgartner/victoria-metrics-spring-boot-demo/issues/new/choose
+    about: Use this for general project issues or suggestions.
