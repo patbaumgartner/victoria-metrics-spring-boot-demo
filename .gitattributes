@@ -1,0 +1,40 @@
+# Normalize line endings: auto-detect text files and use LF in the repo.
+* text=auto eol=lf
+
+# ---- Explicit text files ----
+*.java      text diff=java
+*.xml       text
+*.yml       text
+*.yaml      text
+*.json      text
+*.md        text diff=markdown
+*.properties text
+*.txt       text
+*.gitignore text
+*.gitattributes text
+Dockerfile  text
+
+# Shell scripts must keep LF (they run inside Linux containers / CI).
+*.sh        text eol=lf
+
+# Windows batch / Maven wrapper scripts keep CRLF.
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+mvnw.cmd    text eol=crlf
+
+# ---- Binary files (never normalized or diffed as text) ----
+*.jar       binary
+*.war       binary
+*.ear       binary
+*.class     binary
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.zip       binary
+*.gz        binary
+*.tar       binary
+
+# ---- Language stats / linguist ----
+*.json      linguist-language=JSON

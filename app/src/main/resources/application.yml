@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: victoria-metrics-demo
+
+server:
+  port: 8080
+
+# All telemetry (metrics, traces, logs) is exported via OTLP/HTTP to the
+# OpenTelemetry Collector. The base endpoint is provided by the
+# OTEL_EXPORTER_OTLP_ENDPOINT environment variable (see docker-compose.yml);
+# Spring Boot appends the signal-specific path for each signal.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  endpoint:
+    health:
+      show-details: always
+  observations:
+    annotations:
+      enabled: true            # enable @Observed support
+  tracing:
+    sampling:
+      probability: 1.0         # sample every request in this demo
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  otlp:
+    metrics:
+      export:
+        url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}/v1/metrics
+        step: 10s
+  opentelemetry:
+    resource-attributes:
+      service.namespace: demo
+      service.version: 1.0.0
+      deployment.environment: development
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}/v1/traces
+    logging:
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}/v1/logs
+
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG

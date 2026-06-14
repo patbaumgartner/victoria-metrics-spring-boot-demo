@@ -1,0 +1,53 @@
+# ---- Maven / Java build output ----
+target/
+*.class
+*.jar
+!app/.mvn/wrapper/maven-wrapper.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Maven wrapper (keep the wrapper script, ignore the downloaded jar)
+.mvn/wrapper/maven-wrapper.jar
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- IDE: IntelliJ ----
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ---- IDE: Eclipse ----
+.classpath
+.project
+.settings/
+.factorypath
+bin/
+
+# ---- IDE: VS Code ----
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# ---- OS ----
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---- Environment / secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Docker ----
+docker-compose.override.yml
