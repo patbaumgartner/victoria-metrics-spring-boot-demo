@@ -1,0 +1,53 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
+  batch:
+    send_batch_size: 1000
+    timeout: 10s
+
+exporters:
+  # Metrics -> VictoriaMetrics (OTLP ingestion)
+  otlp_http/metrics:
+    metrics_endpoint: http://victoria-metrics:8428/opentelemetry/v1/metrics
+
+  # Logs -> VictoriaLogs (OTLP ingestion)
+  otlp_http/logs:
+    logs_endpoint: http://victoria-logs:9428/insert/opentelemetry/v1/logs
+
+  # Logs -> Loki (Grafana Logs Drilldown compatibility via OTLP)
+  otlp_http/loki_logs:
+    logs_endpoint: http://loki:3100/otlp/v1/logs
+
+  # Traces -> VictoriaTraces (OTLP/HTTP ingestion)
+  otlp_http/traces:
+    traces_endpoint: http://victoria-traces:9428/insert/opentelemetry/v1/traces
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+service:
+  extensions: [health_check]
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_http/metrics]
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_http/traces]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_http/logs, otlp_http/loki_logs]
