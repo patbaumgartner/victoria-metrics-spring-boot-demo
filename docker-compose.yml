@@ -1,7 +1,7 @@
 services:
   # VictoriaMetrics - Time Series Database
   victoria-metrics:
-    image: victoriametrics/victoria-metrics:latest
+    image: victoriametrics/victoria-metrics:v1.147.0
     container_name: victoria-metrics
     restart: unless-stopped
     ports:
@@ -24,7 +24,7 @@ services:
 
   # VictoriaLogs - Log Aggregation
   victoria-logs:
-    image: victoriametrics/victoria-logs:latest
+    image: victoriametrics/victoria-logs:v1.52.0
     container_name: victoria-logs
     restart: unless-stopped
     ports:
@@ -46,7 +46,7 @@ services:
 
   # Loki - Log backend used by Grafana Logs Drilldown app
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:3.7.3
     container_name: loki
     restart: unless-stopped
     ports:
@@ -67,7 +67,7 @@ services:
 
   # VictoriaTraces - Distributed Tracing
   victoria-traces:
-    image: victoriametrics/victoria-traces:latest
+    image: victoriametrics/victoria-traces:v0.9.4
     container_name: victoria-traces
     restart: unless-stopped
     ports:
@@ -89,7 +89,7 @@ services:
 
   # Grafana - Visualization
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.1.0
     container_name: grafana
     restart: unless-stopped
     ports:
@@ -122,7 +122,7 @@ services:
 
   # OpenTelemetry Collector - Receives OTLP from apps
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:0.156.0
     container_name: otel-collector
     restart: unless-stopped
     ports:
