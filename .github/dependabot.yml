@@ -1,4 +1,5 @@
 version: 2
+# trigger: refresh Dependabot after pinning docker-compose image tags (2026-07-20)
 updates:
 - package-ecosystem: maven
   directory: /app
