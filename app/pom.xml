@@ -20,6 +20,26 @@
     <opentelemetry-logback-appender.version>2.30.0-alpha</opentelemetry-logback-appender.version>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <!--
+        Spring Boot manages the stable OpenTelemetry artifacts via `opentelemetry-bom`
+        (${opentelemetry.version}), but NOT the `-alpha` ones. The Logback appender pulls in
+        `opentelemetry-api-incubator` transitively, which would otherwise resolve to a newer
+        version than the Boot-managed SDK and fail at runtime with NoClassDefFoundError.
+        Importing the alpha BOM at the exact same version keeps stable and incubating
+        artifacts on one consistent OpenTelemetry release.
+      -->
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-bom-alpha</artifactId>
+        <version>${opentelemetry.version}-alpha</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <!-- Spring Boot Starters -->
     <dependency>
@@ -79,6 +99,13 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-opentelemetry-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- In-memory span/log exporters so tests can assert on real exported telemetry -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-sdk-testing</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
