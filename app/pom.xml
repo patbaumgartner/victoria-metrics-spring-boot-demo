@@ -41,7 +41,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <!-- Spring Boot Starters -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -52,12 +51,11 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
-    <!-- Spring Boot telemetry starters -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-micrometer-metrics</artifactId>
-    </dependency>
-
+    <!--
+      Brings the whole telemetry stack in one starter: the Micrometer metrics starter,
+      the OTLP meter registry, the Micrometer Tracing OpenTelemetry bridge and the OTLP
+      exporter. Declaring any of those separately would only duplicate this starter.
+    -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-opentelemetry</artifactId>
@@ -69,33 +67,17 @@
       <artifactId>aspectjweaver</artifactId>
     </dependency>
 
-    <!-- Exports Micrometer metrics over OTLP -->
-    <dependency>
-      <groupId>io.micrometer</groupId>
-      <artifactId>micrometer-registry-otlp</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- Bridges Logback logs into OpenTelemetry for OTLP log export -->
+    <!--
+      Bridges Logback logs into OpenTelemetry for OTLP log export. Not part of Spring
+      Boot, so it is versioned here and kept in sync with the SDK by the alpha BOM above.
+    -->
     <dependency>
       <groupId>io.opentelemetry.instrumentation</groupId>
       <artifactId>opentelemetry-logback-appender-1.0</artifactId>
       <version>${opentelemetry-logback-appender.version}</version>
     </dependency>
 
-    <!-- Testing -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-micrometer-metrics-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
+    <!-- Testing: the OpenTelemetry test starter also provides spring-boot-starter-test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-opentelemetry-test</artifactId>
