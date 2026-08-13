@@ -1,0 +1,23 @@
+# Test profile.
+#
+# The full telemetry pipeline stays wired so integration tests genuinely exercise it,
+# but the OTLP network exporters are switched off: tests must never depend on a running
+# collector. Assertions are made against the in-memory exporters registered by
+# com.example.support.InMemoryTelemetry instead.
+management:
+  logging:
+    export:
+      otlp:
+        enabled: false
+  tracing:
+    export:
+      otlp:
+        enabled: false
+  otlp:
+    metrics:
+      export:
+        enabled: false
+
+logging:
+  level:
+    io.opentelemetry: WARN
