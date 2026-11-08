@@ -29,6 +29,10 @@ updates:
   commit-message:
     prefix: ci(deps)
     include: scope
+  groups:
+    multi-step-actions:
+      patterns:
+      - github/codeql-action/*
 - package-ecosystem: docker
   directory: /
   schedule:
@@ -44,7 +48,3 @@ updates:
     prefix: chore(deps)
     prefix-development: chore(deps-dev)
     include: scope
-groups:
-  multi-step-actions:
-    patterns:
-    - github/codeql-action/*
